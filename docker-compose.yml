@@ -1,0 +1,34 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: match-postgres
+    environment:
+      POSTGRES_DB: match_db
+      POSTGRES_USER: match_user
+      POSTGRES_PASSWORD: match_password
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    networks:
+      - match-network
+
+  app:
+    build:
+      context: .
+      dockerfile: src/main/docker/Dockerfile
+    container_name: match-app
+    depends_on:
+      - postgres
+    ports:
+      - "8080:8080"
+    networks:
+      - match-network
+
+volumes:
+  pgdata:
+
+networks:
+  match-network:
