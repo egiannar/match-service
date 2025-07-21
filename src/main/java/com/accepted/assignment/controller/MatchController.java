@@ -16,6 +16,7 @@ import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import jakarta.validation.Valid;
 import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -45,13 +46,17 @@ public class MatchController {
   @ApiResponses( value = {
       @ApiResponse( responseCode ="200", description ="Match created",
           content = @Content(mediaType = "application/json", schema = @Schema(implementation = Match.class),
-              examples = @ExampleObject(name = "MatchExample", value = "{\"id\":1, \"description\":\"Championship Final\",\"matchDate\":\"2025-08-15\",\"matchTime\":\"18:30:00\",\"teamA\":\"Team Alpha\",\"teamB\":\"Team Beta\",\"sport\":\"FOOTBALL\"}"))),
+              examples = @ExampleObject(name = "MatchExample", value = "{\"id\":1, \"description\":\"Championship Final\",\"matchDate\":\"2025-08-15\",\"matchTime\":\"18:30:00\",\"teamA\":\"Team Alpha\",\"teamB\":\"Team Beta\",\"sport\":\"1\"}"))),
       @ApiResponse(responseCode = "500", description = "Internal Server Error",
           content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class),
               examples = @ExampleObject(name = "Internal Server Error", value = "{ \"error\": { \"code\": \"generalException\", \"message\": \"There was an internal server error while processing the request.\", \"innerError\": { \"type\": \"application\", \"date\": \"2025-07-21T10:42:02.484+00:00\" } } }"))),
       @ApiResponse(responseCode = "400", description = "Bad Request",
           content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class),
-              examples = @ExampleObject(name = "BadRequest", value = "{\"error\":{\"code\":\"BAD_REQUEST\",\"message\":\"Invalid match, team PAO cannot play against itself. Please try again.\",\"innerError\":{\"type\":\"BadRequestException\",\"date\":\"2025-07-21+03:00\"}}}")))
+              examples = @ExampleObject(name = "BadRequest", value = "{\"error\":{\"code\":\"BAD_REQUEST\",\"message\":\"Invalid match, team PAO cannot play against itself. Please try again.\",\"innerError\":{\"type\":\"BadRequestException\",\"date\":\"2025-07-21+03:00\"}}}"))),
+      @ApiResponse(responseCode = "400", description = "Bad Request",
+          content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class),
+              examples = @ExampleObject(name = "BadRequest", value = "{\"error\":{\"code\":\"BAD_REQUEST\",\"message\":\"Unsupported sport id:100.\",\"innerError\":{\"type\":\"BadRequestException\",\"date\":\"2025-07-21+03:00\"}}}")))
+
   })
   @PostMapping("")
   public ResponseEntity<Match> createMatch(@RequestBody MatchRequest request) {
@@ -63,10 +68,10 @@ public class MatchController {
   @ApiResponses( value = {
       @ApiResponse( responseCode ="200", description ="Get match",
           content = @Content(mediaType = "application/json", schema = @Schema(implementation = Match.class),
-              examples = @ExampleObject(name = "MatchExample", value = "{\"id\":1,\"description\":\"Championship Final\",\"matchDate\":\"2025-08-15\",\"matchTime\":\"18:30:00\",\"teamA\":\"Team Alpha\",\"teamB\":\"Team Beta\",\"sport\":\"FOOTBALL\"}"))),
+              examples = @ExampleObject(name = "MatchExample", value = "{\"id\":1,\"description\":\"Championship Final\",\"matchDate\":\"2025-08-15\",\"matchTime\":\"18:30:00\",\"teamA\":\"Team Alpha\",\"teamB\":\"Team Beta\",\"sport\":\"1\"}"))),
       @ApiResponse(responseCode = "404", description = "Not Found",
           content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class),
-              examples = @ExampleObject(name = "BadRequest", value = "{\"error\":{\"code\":\"NOT_FOUND\",\"message\":\"No match found with id 325.\",\"innerError\":{\"type\":\"NotFoundException\",\"date\":\"2025-07-21+03:00\"}}}"))),
+              examples = @ExampleObject(name = "Not Found", value = "{\"error\":{\"code\":\"NOT_FOUND\",\"message\":\"No match found with id 325.\",\"innerError\":{\"type\":\"NotFoundException\",\"date\":\"2025-07-21+03:00\"}}}"))),
       @ApiResponse(responseCode = "500", description = "Internal Server Error",
           content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class),
               examples = @ExampleObject(name = "Internal Server Error", value = "{ \"error\": { \"code\": \"generalException\", \"message\": \"There was an internal server error while processing the request.\", \"innerError\": { \"type\": \"application\", \"date\": \"2025-07-21T10:42:02.484+00:00\" } } }")))
@@ -81,7 +86,7 @@ public class MatchController {
   @ApiResponses( value = {
       @ApiResponse( responseCode ="200", description ="Get all matches",
           content = @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = Match.class)),
-              examples = @ExampleObject(name = "MatchExample", value = "[{\"id\":1,\"description\":\"Championship Final\",\"matchDate\":\"2025-08-15\",\"matchTime\":\"18:30:00\",\"teamA\":\"Team Alpha\",\"teamB\":\"Team Beta\",\"sport\":\"FOOTBALL\"}, \"id\":2,\"description\":\"Championship Semi Final\",\"matchDate\":\"2025-08-15\",\"matchTime\":\"13:30:00\",\"teamA\":\"Team C\",\"teamB\":\"Team D\",\"sport\":\"FOOTBALL\"}]"))),
+              examples = @ExampleObject(name = "MatchExample", value = "[{\"id\":1,\"description\":\"Championship Final\",\"matchDate\":\"2025-08-15\",\"matchTime\":\"18:30:00\",\"teamA\":\"Team Alpha\",\"teamB\":\"Team Beta\",\"sport\":\"1\"}, \"id\":2,\"description\":\"Championship Semi Final\",\"matchDate\":\"2025-08-15\",\"matchTime\":\"13:30:00\",\"teamA\":\"Team C\",\"teamB\":\"Team D\",\"sport\":\"1\"}]"))),
       @ApiResponse(responseCode = "500", description = "Internal Server Error",
           content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class),
               examples = @ExampleObject(name = "Internal Server Error", value = "{ \"error\": { \"code\": \"generalException\", \"message\": \"There was an internal server error while processing the request.\", \"innerError\": { \"type\": \"application\", \"date\": \"2025-07-21T10:42:02.484+00:00\" } } }")))
@@ -97,13 +102,13 @@ public class MatchController {
   @ApiResponses( value = {
       @ApiResponse( responseCode ="200", description ="Update match",
           content = @Content(mediaType = "application/json", schema = @Schema(implementation = Match.class),
-              examples = @ExampleObject(name = "MatchExample", value = "{\"id\":1, \"description\":\"Championship Final\",\"matchDate\":\"2025-09-16\",\"matchTime\":\"20:30:00\",\"teamA\":\"Team Alpha\",\"teamB\":\"Team Beta\",\"sport\":\"FOOTBALL\"}"))),
+              examples = @ExampleObject(name = "MatchExample", value = "{\"id\":1, \"description\":\"Championship Final\",\"matchDate\":\"2025-09-16\",\"matchTime\":\"20:30:00\",\"teamA\":\"Team Alpha\",\"teamB\":\"Team Beta\",\"sport\":\"1\"}"))),
       @ApiResponse(responseCode = "404", description = "Not Found",
           content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class),
-              examples = @ExampleObject(name = "BadRequest", value = "{\"error\":{\"code\":\"NOT_FOUND\",\"message\":\"No match found with id 6.\",\"innerError\":{\"type\":\"NotFoundException\",\"date\":\"2025-07-21+03:00\"}}}"))),
+              examples = @ExampleObject(name = "Not Found", value = "{\"error\":{\"code\":\"NOT_FOUND\",\"message\":\"No match found with id 6.\",\"innerError\":{\"type\":\"NotFoundException\",\"date\":\"2025-07-21+03:00\"}}}"))),
       @ApiResponse(responseCode = "400", description = "Bad Request",
           content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class),
-              examples = @ExampleObject(name = "BadRequest", value = "{\"error\":{\"code\":\"BAD_REQUEST\",\"message\":\"Invalid match, team PAO cannot play against itself. Please try again.\",\"innerError\":{\"type\":\"BadRequestException\",\"date\":\"2025-07-21+03:00\"}}}"))),
+              examples = @ExampleObject(name = "Bad Request", value = "{\"error\":{\"code\":\"BAD_REQUEST\",\"message\":\"Invalid match, team PAO cannot play against itself. Please try again.\",\"innerError\":{\"type\":\"BadRequestException\",\"date\":\"2025-07-21+03:00\"}}}"))),
       @ApiResponse(responseCode = "500", description = "Internal Server Error",
           content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class),
               examples = @ExampleObject(name = "Internal Server Error", value = "{ \"error\": { \"code\": \"generalException\", \"message\": \"There was an internal server error while processing the request.\", \"innerError\": { \"type\": \"application\", \"date\": \"2025-07-21T10:42:02.484+00:00\" } } }")))
@@ -141,13 +146,16 @@ public class MatchController {
               examples = @ExampleObject(name = "CrateMatchOddExample", value = "{\"id\":1, \"matchId\":\"1\", \"specifier\":\"X\",\"odd\":2.75}"))),
       @ApiResponse(responseCode = "404", description = "Not Found",
           content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class),
-              examples = @ExampleObject(name = "BadRequest", value = "{\"error\":{\"code\":\"NOT_FOUND\",\"message\":\"No match found with id 6.\",\"innerError\":{\"type\":\"NotFoundException\",\"date\":\"2025-07-21+03:00\"}}}"))),
+              examples = @ExampleObject(name = "Not Found", value = "{\"error\":{\"code\":\"NOT_FOUND\",\"message\":\"No match found with id 6.\",\"innerError\":{\"type\":\"NotFoundException\",\"date\":\"2025-07-21+03:00\"}}}"))),
+      @ApiResponse(responseCode = "409", description = "Conflict",
+          content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class),
+              examples = @ExampleObject(name = "Conflict", value = "{\"error\":{\"code\":\"CONFLICT\",\"message\":\"Odd X for match id 2 already exists\",\"innerError\":{\"type\":\"ConflictException\",\"date\":\"2025-07-21+03:00\"}}}"))),
+      @ApiResponse(responseCode = "406", description = "Not Acceptable",
+          content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class),
+              examples = @ExampleObject(name = "Not Acceptable", value = "{\"error\":{\"code\":\"NOT_ACCEPTABLE\",\"message\":\"Odd 0.95 is not valid, as it must be over 1.01. Please try again\",\"innerError\":{\"type\":\"ConflictException\",\"date\":\"2025-07-21+03:00\"}}}"))),
       @ApiResponse(responseCode = "500", description = "Internal Server Error",
           content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class),
-              examples = @ExampleObject(name = "Internal Server Error", value = "{ \"error\": { \"code\": \"generalException\", \"message\": \"There was an internal server error while processing the request.\", \"innerError\": { \"type\": \"application\", \"date\": \"2025-07-21T10:42:02.484+00:00\" } } }"))),
-      @ApiResponse(responseCode = "400", description = "Bad Request",
-          content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class),
-              examples = @ExampleObject(name = "BadRequest", value = "{\"error\":{\"code\":\"BAD_REQUEST\",\"message\":\"/TODO: Complete\",\"innerError\":{\"type\":\"BadRequestException\",\"date\":\"2025-07-21+03:00\"}}}")))
+              examples = @ExampleObject(name = "Internal Server Error", value = "{ \"error\": { \"code\": \"generalException\", \"message\": \"There was an internal server error while processing the request.\", \"innerError\": { \"type\": \"application\", \"date\": \"2025-07-21T10:42:02.484+00:00\" } } }")))
   })
   @PostMapping("/{id}/odds")
   public ResponseEntity<MatchOddResponse> createMatchOdd(@PathVariable Integer id, @RequestBody MatchOddRequest matchOddRequest) {
@@ -162,7 +170,7 @@ public class MatchController {
               examples = @ExampleObject(name = "MatchExample", value = "{[\"id\":1,\"matchId\":10,\"specifier\":\"1\",\"odd\":2.75}, \"id\":2,\"matchId\":10,\"specifier\":\"X\",\"odd\":1.75}]}"))),
       @ApiResponse(responseCode = "404", description = "Not Found",
           content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class),
-              examples = @ExampleObject(name = "BadRequest", value = "{\"error\":{\"code\":\"NOT_FOUND\",\"message\":\"No match found with id 6.\",\"innerError\":{\"type\":\"NotFoundException\",\"date\":\"2025-07-21+03:00\"}}}"))),
+              examples = @ExampleObject(name = "Bad Request", value = "{\"error\":{\"code\":\"NOT_FOUND\",\"message\":\"No match found with id 6.\",\"innerError\":{\"type\":\"NotFoundException\",\"date\":\"2025-07-21+03:00\"}}}"))),
       @ApiResponse(responseCode = "500", description = "Internal Server Error",
           content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class),
               examples = @ExampleObject(name = "Internal Server Error", value = "{ \"error\": { \"code\": \"generalException\", \"message\": \"There was an internal server error while processing the request.\", \"innerError\": { \"type\": \"application\", \"date\": \"2025-07-21T10:42:02.484+00:00\" } } }")))
@@ -196,10 +204,16 @@ public class MatchController {
               examples = @ExampleObject(name = "UpdateMatchOddExample", value = "{\"id\":1,\"matchId\":10,\"specifier\":\"1\",\"odd\":3.05}"))),
       @ApiResponse(responseCode = "404", description = "Not Found",
           content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class),
-              examples = @ExampleObject(name = "NotFound", value = "{\"error\":{\"code\":\"NOT_FOUND\",\"message\":\"No match found with id 325.\",\"innerError\":{\"type\":\"NotFoundException\",\"date\":\"2025-07-21+03:00\"}}}"))),
+              examples = @ExampleObject(name = "Not Found", value = "{\"error\":{\"code\":\"NOT_FOUND\",\"message\":\"No match found with id 325.\",\"innerError\":{\"type\":\"NotFoundException\",\"date\":\"2025-07-21+03:00\"}}}"))),
+      @ApiResponse(responseCode = "404", description = "Not Found",
+          content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class),
+              examples = @ExampleObject(name = "Not Found", value = "{\"error\":{\"code\":\"NOT_FOUND\",\"message\":\"MatchOdd not found for matchId 1 and specifier 2\",\"innerError\":{\"type\":\"BadRequestException\",\"date\":\"2025-07-21+03:00\"}}}"))),
       @ApiResponse(responseCode = "400", description = "Bad Request",
           content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class),
-              examples = @ExampleObject(name = "BadRequest", value = "{\"error\":{\"code\":\"BAD_REQUEST\",\"message\":\"TODO:.\",\"innerError\":{\"type\":\"BadRequestException\",\"date\":\"2025-07-21+03:00\"}}}"))),
+              examples = @ExampleObject(name = "Bad Request", value = "{\"error\":{\"code\":\"BAD_REQUEST\",\"message\":\"TODO:.\",\"innerError\":{\"type\":\"BadRequestException\",\"date\":\"2025-07-21+03:00\"}}}"))),
+      @ApiResponse(responseCode = "406", description = "Not Acceptable",
+          content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class),
+              examples = @ExampleObject(name = "Not Acceptable", value = "{\"error\":{\"code\":\"NOT_ACCEPTABLE\",\"message\":\"Odd 0.95 is not valid, as it must be over 1.01. Please try again\",\"innerError\":{\"type\":\"ConflictException\",\"date\":\"2025-07-21+03:00\"}}}"))),
       @ApiResponse(responseCode = "500", description = "Internal Server Error",
           content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class),
               examples = @ExampleObject(name = "Internal Server Error", value = "{ \"error\": { \"code\": \"generalException\", \"message\": \"There was an internal server error while processing the request.\", \"innerError\": { \"type\": \"application\", \"date\": \"2025-07-21T10:42:02.484+00:00\" } } }")))
@@ -210,14 +224,14 @@ public class MatchController {
     return new ResponseEntity<>(response, HttpStatus.OK);
   }
 
-  @Operation(summary = "Delete match odd", description = "Update match odd")
+  @Operation(summary = "Delete match odds", description = "Update match odds")
   @ApiResponses( value = {
       @ApiResponse( responseCode ="200", description ="Update match odd",
           content = @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = Void.class)),
               examples = @ExampleObject(name = "DeleteMatchOddExample", value = ""))),
       @ApiResponse(responseCode = "404", description = "Not Found",
           content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class),
-              examples = @ExampleObject(name = "NotFound", value = "{\"error\":{\"code\":\"NOT_FOUND\",\"message\":\"No match found with id 325.\",\"innerError\":{\"type\":\"NotFoundException\",\"date\":\"2025-07-21+03:00\"}}}"))),
+              examples = @ExampleObject(name = "Not Found", value = "{\"error\":{\"code\":\"NOT_FOUND\",\"message\":\"No match found with id 325.\",\"innerError\":{\"type\":\"NotFoundException\",\"date\":\"2025-07-21+03:00\"}}}"))),
       @ApiResponse(responseCode = "500", description = "Internal Server Error",
           content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class),
               examples = @ExampleObject(name = "Internal Server Error", value = "{ \"error\": { \"code\": \"generalException\", \"message\": \"There was an internal server error while processing the request.\", \"innerError\": { \"type\": \"application\", \"date\": \"2025-07-21T10:42:02.484+00:00\" } } }")))

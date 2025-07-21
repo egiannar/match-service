@@ -2,6 +2,7 @@ package com.accepted.assignment.mapper;
 
 import com.accepted.assignment.model.MatchOdd;
 import com.accepted.assignment.model.domain.MatchOddResponse;
+import java.math.BigDecimal;
 import org.springframework.stereotype.Component;
 
 @Component

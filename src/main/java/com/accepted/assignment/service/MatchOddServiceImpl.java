@@ -1,5 +1,7 @@
 package com.accepted.assignment.service;
 
+import com.accepted.assignment.exception.ExistingMatchOddException;
+import com.accepted.assignment.exception.InvalidOddException;
 import com.accepted.assignment.exception.NotFoundException;
 import com.accepted.assignment.mapper.MatchOddMapper;
 import com.accepted.assignment.model.Match;
@@ -8,8 +10,10 @@ import com.accepted.assignment.model.domain.MatchOddRequest;
 import com.accepted.assignment.model.domain.MatchOddResponse;
 import com.accepted.assignment.model.domain.UpdateMatchOddRequest;
 import com.accepted.assignment.repository.MatchOddRepository;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -35,12 +39,24 @@ public class MatchOddServiceImpl implements MatchOddService{
     if (match == null)
       throw new NotFoundException(MATCH_NOT_FOUND_MESSAGE.formatted(id));
 
+    Optional<MatchOdd> matchIdAndSpecifier = matchOddRepository.findByMatchIdAndSpecifier(id,
+        createMatchOddRequest.getSpecifier());
+
+    if (matchIdAndSpecifier.isPresent()) {
+      throw new ExistingMatchOddException("Odd %s for match id %s already exists.".formatted(createMatchOddRequest.getSpecifier(), id));
+    }
+
+    if (createMatchOddRequest.getOdd() < 1.01) {
+      throw new InvalidOddException("Odd %s is not valid, as it must be over 1.01. Please try again".formatted(createMatchOddRequest.getOdd()));
+    }
+
     MatchOdd matchOdd = MatchOdd.builder()
         .match(match)
         .specifier(createMatchOddRequest.getSpecifier())
         .odd(createMatchOddRequest.getOdd())
     .build();
     MatchOdd saved = matchOddRepository.save(matchOdd);
+
     return matchOddMapper.toResponse(saved);
   }
 
@@ -72,21 +88,24 @@ public class MatchOddServiceImpl implements MatchOddService{
   }
 
   @Override
-  public MatchOddResponse updateMatchOdd(Integer matchId, UpdateMatchOddRequest updateMatchOdd) {
+  public MatchOddResponse updateMatchOdd(Integer matchId, UpdateMatchOddRequest updateMatchOddRequest) {
     Match matchById = matchService.getMatchById(matchId);
     if (matchById == null)
       throw new NotFoundException(MATCH_NOT_FOUND_MESSAGE.formatted(matchId));
 
-    MatchOdd matchOdd = matchOddRepository.findByMatchIdAndSpecifier(matchId,
-            updateMatchOdd.getSpecifier())
+    MatchOdd matchOdd = matchOddRepository.findByMatchIdAndSpecifier(matchId, updateMatchOddRequest.getSpecifier())
         .orElseThrow(
-            () -> new RuntimeException(
+            () -> new NotFoundException(
                 "MatchOdd not found for matchId %s and specifier %s"
-                    .formatted(matchId, updateMatchOdd.getSpecifier())
+                    .formatted(matchId, updateMatchOddRequest.getSpecifier())
             )
         );
 
-    matchOdd.setOdd(updateMatchOdd.getOdd());
+    if (updateMatchOddRequest.getOdd() < 1.01) {
+      throw new InvalidOddException("Odd %s is not valid, as it must be over 1.01. Please try again".formatted(updateMatchOddRequest.getOdd()));
+    }
+
+    matchOdd.setOdd(updateMatchOddRequest.getOdd());
     MatchOdd saved = matchOddRepository.save(matchOdd);
     return matchOddMapper.toResponse(saved);
   }
