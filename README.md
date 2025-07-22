@@ -21,10 +21,9 @@ The service is containerized for easy deployment and includes a Swagger UI for A
 
 ### Prerequisites
 
-Make sure you have the following installed:
+Make sure you have the following installed and running:
 
 - [Docker](https://www.docker.com/)
-- [Docker Compose](https://docs.docker.com/compose/)
 
 ### Run the Application
 
