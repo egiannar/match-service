@@ -33,6 +33,8 @@ public class MatchServiceImpl implements MatchService{
         .teamB(request.getTeamB())
         .sport(request.getSport())
     .build();
+
+    log.info("Match with id {} saved successfully", match.getId());
     return matchRepository.save(match);
   }
 

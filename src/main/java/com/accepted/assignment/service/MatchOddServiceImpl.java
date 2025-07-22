@@ -10,7 +10,6 @@ import com.accepted.assignment.model.domain.MatchOddRequest;
 import com.accepted.assignment.model.domain.MatchOddResponse;
 import com.accepted.assignment.model.domain.UpdateMatchOddRequest;
 import com.accepted.assignment.repository.MatchOddRepository;
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -39,6 +38,7 @@ public class MatchOddServiceImpl implements MatchOddService{
     if (match == null)
       throw new NotFoundException(MATCH_NOT_FOUND_MESSAGE.formatted(id));
 
+    // in real life scenario this can be replaced by a simple db constraint
     Optional<MatchOdd> matchIdAndSpecifier = matchOddRepository.findByMatchIdAndSpecifier(id,
         createMatchOddRequest.getSpecifier());
 

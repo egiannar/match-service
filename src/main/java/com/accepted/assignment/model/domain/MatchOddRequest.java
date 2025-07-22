@@ -1,6 +1,5 @@
 package com.accepted.assignment.model.domain;
 
-import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
 @Data
